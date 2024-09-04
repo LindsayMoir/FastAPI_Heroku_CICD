@@ -2,7 +2,8 @@
 Very strange!
 
 ## Model Details
-- Person or organization developing model: Lindsay Moir for Udacity Machine Learning DevOps Engineer course, Project FastAPI
+Person or organization developing model: Lindsay Moir for Udacity Machine Learning DevOps Engineer course, Project FastAPI
+
 Model date: September 30, 2024
 Model version: 1.0
 Model type: Gradient Boosting Classifier
@@ -17,7 +18,7 @@ Features:
 Categorical features were one-hot encoded.
 Class imbalance was handled using SMOTENC.
 Fairness Constraints: Not specified.
-License: https://github.com/LindsayMoir/FastAPI_CICD_Machine_Learning/blob/master/LICENSE.txt
+License: https://github.com/LindsayMoir/FastAPI_Heroku_CICD/blob/main/starter/model_card.md
 
 ## Intended Use
 Primary intended uses:
