@@ -2,7 +2,7 @@
 Very strange!
 
 ## Model Details
-Person or organization developing model: Lindsay Moir for Udacity Machine Learning DevOps Engineer course, Project FastAPI
+- Person or organization developing model: Lindsay Moir for Udacity Machine Learning DevOps Engineer course, Project FastAPI
 Model date: September 30, 2024
 Model version: 1.0
 Model type: Gradient Boosting Classifier
@@ -38,7 +38,7 @@ Cross-validation was used to ensure robustness across different data splits.
 ## Metrics
 Model performance measures:
 Accuracy: 87%
-F1-Score: Class 0 .91, Class 1 .74, Weighted Average .83
+F1-Score: Class 0 .91, Class 1 .74, Weighted Average .87 (coincidentally)
 Decision thresholds:
 The model uses default decision thresholds optimized by GridSearchCV.
 Variation approaches:
