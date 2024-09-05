@@ -24,9 +24,6 @@ from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_sp
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 import yaml
 
-# Global variable to store configuration
-config = None
-
 
 def setup_env(working_directory):
     """
@@ -42,7 +39,6 @@ def setup_env(working_directory):
     Raises:
         FileNotFoundError: If the 'config/config.yaml' file is not found.
     """
-    global config
 
     # Change the working directory to the one provided via command line or default
     os.chdir(working_directory)
@@ -411,7 +407,6 @@ def evaluate_model_slices():
 
     # Write resuls to disk
     results_df.to_csv(config['models']['slice_results'], index=False)
-    logging.info(f"SUCCESS: Performance metrics calculated for each slice.")
 
     return results_df
 
@@ -420,38 +415,35 @@ def log_end(config, start_time):
     """
     This function logs the end of the run and updates the CSV file with the end time and elapsed time
     """
-    print(config)
-    print(config['files'])  # Ensure 'files' is present and correct
-    print(config['files']['run_statistics'])  # Ensure the key exists
 
     # File path for the CSV file in the 'ml' directory
     file_path = config['files']['run_statistics']
 
     # Get the current time as the end time
-    end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    end_time = datetime.now()
+
+    # Compute elapsed time as the difference between end_time and start_time
+    elapsed_time = end_time - start_time
 
     # Check if the file exists
     if os.path.exists(file_path):
         # Read the existing CSV file
         df = pd.read_csv(file_path)
 
-        # Compute elapsed time as the difference between end_time and start_time
-        end_time_dt = datetime.now()
-        elapsed_time = end_time_dt - start_time
-
         # Append the end time and elapsed time to the DataFrame
-        df = df.append({'start_time': start_time, 
-                        'end_time': end_time, 
-                        'elapsed_time': elapsed_time})
+        df = pd.concat([df, pd.DataFrame([{'start_time': start_time, 
+                                           'end_time': end_time, 
+                                           'elapsed_time': elapsed_time}])], 
+                                           ignore_index=True)
 
         # Save the updated DataFrame back to the CSV file
         df.to_csv(file_path, index=False)
 
     else:
         # Create a new DataFrame with the start time and end time
-        df = pd.DataFrame({'start_time': start_time, 
-                           'end_time': end_time, 
-                           'elapsed_time': elapsed_time})
+        df = pd.DataFrame({'start_time': [start_time], 
+                           'end_time': [end_time], 
+                           'elapsed_time': [elapsed_time]})
 
         # Save the DataFrame to a new CSV file
         df.to_csv(file_path, index=False)

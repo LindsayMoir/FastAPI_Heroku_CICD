@@ -10,7 +10,7 @@ data:
 files:
   working_directory: 'D:/GitHub/nd0821-c3-starter-code/starter'
   log_file: 'logs/ml.log'
-  run_statistics: 'logs/run_statistics.csv'
+  run_log: 'logs/run_statistics.csv'
 
 models:
   best_model: 'ml/best_model.pkl'
