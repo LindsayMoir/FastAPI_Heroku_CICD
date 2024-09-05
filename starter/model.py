@@ -7,6 +7,7 @@ feature importance, and produces quality metrics.
 
 # import libraries
 import argparse
+from datetime import datetime
 from imblearn.over_sampling import SMOTENC
 from imblearn.pipeline import Pipeline as ImbPipeline
 import joblib
@@ -58,6 +59,7 @@ def setup_env(working_directory):
     )
 
     return config
+
 
 def load_data():
     """Reads the data from the data source.
@@ -414,7 +416,54 @@ def evaluate_model_slices():
     return results_df
 
 
+def log_end(config, start_time):
+    """
+    This function logs the end of the run and updates the CSV file with the end time and elapsed time
+    """
+    print(config)
+    print(config['files'])  # Ensure 'files' is present and correct
+    print(config['files']['run_statistics'])  # Ensure the key exists
+
+    # File path for the CSV file in the 'ml' directory
+    file_path = config['files']['run_statistics']
+
+    # Get the current time as the end time
+    end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    # Check if the file exists
+    if os.path.exists(file_path):
+        # Read the existing CSV file
+        df = pd.read_csv(file_path)
+
+        # Compute elapsed time as the difference between end_time and start_time
+        end_time_dt = datetime.now()
+        elapsed_time = end_time_dt - start_time
+
+        # Append the end time and elapsed time to the DataFrame
+        df = df.append({'start_time': start_time, 
+                        'end_time': end_time, 
+                        'elapsed_time': elapsed_time})
+
+        # Save the updated DataFrame back to the CSV file
+        df.to_csv(file_path, index=False)
+
+    else:
+        # Create a new DataFrame with the start time and end time
+        df = pd.DataFrame({'start_time': start_time, 
+                           'end_time': end_time, 
+                           'elapsed_time': elapsed_time})
+
+        # Save the DataFrame to a new CSV file
+        df.to_csv(file_path, index=False)
+
+    return end_time, elapsed_time
+
+
 if __name__ == "__main__":
+
+    # Log the start of the run
+    start_time = datetime.now()
+    logging.info(f"SUCCESS: Run started at: {datetime.now()}")
 
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Set up the working environment for the model.')
@@ -462,5 +511,6 @@ if __name__ == "__main__":
     logging.info(f"SUCCESS: Model slices evaluated.")
     results_df = evaluate_model_slices()
 
-    # Log the end of the script
-    logging.info(f"SUCCESS: End of the script.")
+    # Log the end of the run
+    end_time, elapsed_time = log_end(config, start_time)
+    logging.info(f"SUCCESS: Run ended at: {end_time} with an elapsed time of: {elapsed_time}")
