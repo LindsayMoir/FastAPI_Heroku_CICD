@@ -8,7 +8,7 @@ data:
   describe_data_path: "data/describe_cleaned_data.csv"
 
 files:
-  working_directory: 'D:/GitHub/nd0821-c3-starter-code/starter'
+  working_directory: '/mnt/d/GitHub/FastAPI_Heroku_CICD/starter'
   log_file: 'logs/ml.log'
   run_log: 'logs/run_statistics.csv'
 

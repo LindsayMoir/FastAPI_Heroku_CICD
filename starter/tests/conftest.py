@@ -3,9 +3,10 @@ import os
 import sys
 import yaml
 import logging
+import pandas
 
 # Add the directory containing model.py to sys.path
-sys.path.append('/mnt/d/GitHub/nd0821-c3-starter-code/starter')
+sys.path.append('/mnt/d/GitHub/FastAPI_Heroku_CICD/starter')
 
 from model import setup_env, load_data  # Import setup_env and load_data
 
@@ -13,7 +14,7 @@ from model import setup_env, load_data  # Import setup_env and load_data
 def setup_environment():
     """Fixture to set up the environment before tests."""
     # Define the working directory for the tests
-    working_directory = '/mnt/d/GitHub/nd0821-c3-starter-code/starter'
+    working_directory = '/mnt/d/GitHub/FastAPI_Heroku_CICD/starter'
     
     # Call the setup_env function to set up the environment and load the config
     config = setup_env(working_directory)

@@ -24,6 +24,7 @@ from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_sp
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 import yaml
 
+config = None
 
 def setup_env(working_directory):
     """
@@ -39,20 +40,36 @@ def setup_env(working_directory):
     Raises:
         FileNotFoundError: If the 'config/config.yaml' file is not found.
     """
-
+    global config
+    
     # Change the working directory to the one provided via command line or default
     os.chdir(working_directory)
 
     with open('config/config.yaml', 'r') as file:
         config = yaml.safe_load(file)
 
+    # Extract the log file path from the configuration
+    log_file_path = config['files']['log_file']
+    
     # Setup logging
     logging.basicConfig(
-        filename=config['files']['log_file'],
+        filename=log_file_path,
         level=logging.INFO,
+        force=True,
         filemode='w',
         format='%(name)s - %(levelname)s - %(message)s'
     )
+
+    # Access the root logger and retrieve its handlers
+    root_logger = logging.getLogger()
+    handlers = root_logger.handlers
+
+    # Print the absolute path of the log file by inspecting the FileHandler
+    for handler in handlers:
+        if isinstance(handler, logging.FileHandler):
+            print(f"Log file path set to: {handler.baseFilename}")
+        else:
+            print("No file handler found in the root logger")
 
     return config
 
@@ -163,7 +180,7 @@ def find_best_model(X, y_encoded, pipeline):
                                cv=stratified_kfold,  # Stratified K-Fold cross-validation
                                scoring='f1',  # Evaluation metric
                                n_jobs=-1,  # Use all available cores
-                               verbose=1)  # Verbosity level
+                               verbose=4)  # Verbosity level
     
     # Fit GridSearchCV
     grid_search.fit(X_train, y_train)
@@ -381,7 +398,7 @@ def evaluate_model_slices():
             try:
                 auc = roc_auc_score(y_slice, predictions)
             except ValueError as e:
-                logging.warning(f"Error occurred on {feature}, {value}: \n {str(e)}")
+                logging.info(f"Error occurred on {feature}, {value}: \n {str(e)}")
                 auc = 0
 
             # Append results to the list
@@ -411,13 +428,26 @@ def evaluate_model_slices():
     return results_df
 
 
+import os
+import pandas as pd
+from datetime import datetime
+
 def log_end(config, start_time):
     """
-    This function logs the end of the run and updates the CSV file with the end time and elapsed time
+    This function logs the end of the run and updates the CSV file with the end time and elapsed time.
+    Both formatted and unformatted start and end times are written to the CSV.
+
+    Args:
+        config (dict): Configuration dictionary containing file paths.
+        start_time (datetime): The start time of the run.
+
+    Returns:
+        end_time (datetime): The end time of the run.
+        elapsed_time (timedelta): The total elapsed time of the run.
     """
 
     # File path for the CSV file in the 'ml' directory
-    file_path = config['files']['run_statistics']
+    file_path = config['files']['run_log']
 
     # Get the current time as the end time
     end_time = datetime.now()
@@ -425,25 +455,35 @@ def log_end(config, start_time):
     # Compute elapsed time as the difference between end_time and start_time
     elapsed_time = end_time - start_time
 
+    # Store the start and end times in ISO 8601 format for future processing
+    start_time = start_time.isoformat()
+    end_time = end_time.isoformat()
+
     # Check if the file exists
     if os.path.exists(file_path):
         # Read the existing CSV file
         df = pd.read_csv(file_path)
 
         # Append the end time and elapsed time to the DataFrame
-        df = pd.concat([df, pd.DataFrame([{'start_time': start_time, 
-                                           'end_time': end_time, 
-                                           'elapsed_time': elapsed_time}])], 
-                                           ignore_index=True)
+        new_row = {
+            'start_time': start_time,
+            'end_time': end_time,
+            'elapsed_time': elapsed_time
+        }
+
+        # Append new row to the DataFrame
+        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
 
         # Save the updated DataFrame back to the CSV file
         df.to_csv(file_path, index=False)
 
     else:
         # Create a new DataFrame with the start time and end time
-        df = pd.DataFrame({'start_time': [start_time], 
-                           'end_time': [end_time], 
-                           'elapsed_time': [elapsed_time]})
+        df = pd.DataFrame({
+            'start_time': [start_time],
+            'end_time': [end_time],
+            'elapsed_time': [elapsed_time]
+        })
 
         # Save the DataFrame to a new CSV file
         df.to_csv(file_path, index=False)
@@ -460,7 +500,7 @@ if __name__ == "__main__":
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Set up the working environment for the model.')
     parser.add_argument('working_directory', type=str, nargs='?', 
-                        default='D:/GitHub/nd0821-c3-starter-code/starter',
+                        default='/mnt/d/GitHub/FastAPI_Heroku_CICD/starter',
                         help='The path to the working directory')
     args = parser.parse_args()
 
