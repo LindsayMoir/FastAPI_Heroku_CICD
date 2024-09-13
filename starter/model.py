@@ -15,11 +15,17 @@ import logging
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
-from pathlib import Path
+import seaborn as sns
+import yaml
+import joblib
+import logging
+import matplotlib.pyplot as plt
+import os
+import pandas as pd
 import seaborn as sns
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import confusion_matrix, classification_report, roc_curve, roc_auc_score, accuracy_score
+from sklearn.metrics import confusion_matrix, classification_report, roc_curve, roc_auc_score
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 import yaml
@@ -117,9 +123,6 @@ def feature_engineering(data):
     This function sets up and runs the pipeline for feature engineering and model training.
     """
 
-    # Load the cleaned_data
-    data = pd.read_csv(config['data']['cleaned_data_path'])
-
     # Identify categorical features excluding the target variable
     categorical_features = data.select_dtypes(include='object').columns.tolist()
     categorical_features.remove('salary')  # Exclude the target variable
@@ -150,6 +153,9 @@ def feature_engineering(data):
         ('smote', SMOTENC(categorical_features=categorical_indices, random_state=42)),
         ('classifier', GradientBoostingClassifier())
     ])
+
+    # Save the label encoder
+    joblib.dump(label_encoder, config['models']['label_encoder'])
     
     return X, y_encoded, pipeline
 
@@ -207,7 +213,7 @@ def find_best_model(X, y_encoded, pipeline):
     
     return X_test, y_test
 
-def inference(X_test, y_test):
+def inference_batch(X_test, y_test):
     """
     This function performs inference on the test set using the trained model.
 
@@ -232,6 +238,32 @@ def inference(X_test, y_test):
     logging.info(f"{classification_report(y_test, predictions)}")
 
     return predictions, best_model
+
+
+def inference(features):
+    """
+    This function performs inference on a single data sample using the trained model.
+
+    Parameters:
+    - features: Dictionary containing the features for which predictions are to be made.
+
+    Returns:
+    - prediction: The predicted label for the input data.
+    """
+    # Load the best_model, pipeline, and label encoder from disk
+    best_model = joblib.load(config['models']['best_model'])
+    label_encoder = joblib.load(config['models']['label_encoder'])
+
+    # Convert features to DataFrame
+    features_df = pd.DataFrame([features])
+
+    # Perform prediction
+    prediction_encoded = best_model.predict(features_df)
+
+    # Decode the prediction
+    prediction = label_encoder.inverse_transform(prediction_encoded)
+
+    return prediction[0]
 
 
 def feat_import(X, best_model):
@@ -428,10 +460,6 @@ def evaluate_model_slices():
     return results_df
 
 
-import os
-import pandas as pd
-from datetime import datetime
-
 def log_end(config, start_time):
     """
     This function logs the end of the run and updates the CSV file with the end time and elapsed time.
@@ -528,8 +556,23 @@ if __name__ == "__main__":
     logging.info(f"SUCCESS: Best model found and saved to {config['models']['best_model']}")
 
     # Perform inference on the test data
-    predictions, best_model = inference(X_test, y_test)
+    predictions, best_model = inference_batch(X_test, y_test)
     logging.info(f"SUCCESS: Inference completed on the test set.")
+
+    # Perform inference on a single example
+    dict = {'age': 39, 
+            'workclass': 'Local-gov',
+            'education_num': 13,
+            'marital_status': 'Never-married',
+            'occupation': 'Adm-clerical',
+            'relationship': 'Not-in-family',
+            'capital_gain': 2174,
+            'capital_loss': 0,
+            'hours_per_week': 40
+            }
+    single_prediction = inference(dict)
+    # Log the prediction
+    logging.info(f"SUCCESS: Prediction made for single example of input features: {dict} is: {single_prediction}")
 
     # Calculate feature importance
     feat_import(X, best_model)

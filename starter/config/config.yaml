@@ -14,6 +14,7 @@ files:
 
 models:
   best_model: 'ml/best_model.pkl'
+  label_encoder: 'ml/label_encoder.pkl'
   confusion_matrix: 'ml/confusion_matrix.png'
   feature_importance: 'ml/feature_importance.png'
   roc_curve: 'ml/roc_curve.png'
