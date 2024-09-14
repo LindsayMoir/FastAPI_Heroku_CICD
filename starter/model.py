@@ -1,7 +1,7 @@
 # model.py
 """
-This is the module that reads the data, cleans it, feature engineers it, 
-trains the model,  performs inference on the test set, visualizes the 
+This is the module that reads the data, cleans it, feature engineers it,
+trains the model,  performs inference on the test set, visualizes the
 feature importance, and produces quality metrics.
 """
 
@@ -16,26 +16,23 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 import seaborn as sns
-import yaml
-import joblib
-import logging
-import matplotlib.pyplot as plt
-import os
-import pandas as pd
-import seaborn as sns
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import confusion_matrix, classification_report, roc_curve, roc_auc_score
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
+from sklearn.metrics import (confusion_matrix, classification_report,
+                             roc_curve, roc_auc_score)
+from sklearn.model_selection import (GridSearchCV, StratifiedKFold,
+                                     train_test_split)
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 import yaml
 
 config = None
 
+
 def setup_env(working_directory):
     """
-    Sets up the environment by changing the working directory to the provided path and loading the configuration from the
-    'config/config.yaml' file. It also sets up logging with the specified log file.
+    Sets up the environment by changing the working directory to the provided
+    path and loading the configuration from the 'config/config.yaml' file. It
+    also sets up logging with the specified log file.
 
     Args:
         working_directory (str): The path to the working directory.
@@ -47,8 +44,8 @@ def setup_env(working_directory):
         FileNotFoundError: If the 'config/config.yaml' file is not found.
     """
     global config
-    
-    # Change the working directory to the one provided via command line or default
+
+    # Change the working directory to the one provided via command line or
     os.chdir(working_directory)
 
     with open('config/config.yaml', 'r') as file:
@@ -56,7 +53,7 @@ def setup_env(working_directory):
 
     # Extract the log file path from the configuration
     log_file_path = config['files']['log_file']
-    
+
     # Setup logging
     logging.basicConfig(
         filename=log_file_path,
@@ -90,14 +87,30 @@ def load_data():
 
     return data
 
+
 def clean_data(df):
     """
-    This function cleans the data.
+    Clean the given DataFrame by performing the following steps:
+
+    1. Drop duplicates from the DataFrame.
+    2. Remove spaces from column names.
+    3. Remove spaces from values in the columns.
+    4. Replace '-' with '_' in column names.
+    5. Drop 'education', 'sex', 'native_country', 'fnlgt', and 'race' columns.
+    6. Write the cleaned data to a new file.
+
+    Parameters:
+        df (pandas.DataFrame): The DataFrame to be cleaned.
+
+    Returns:
+        pandas.DataFrame: The cleaned DataFrame.
+
     """
 
     # Drop duplicates
     df.drop_duplicates(inplace=True)
-    logging.info(f"SUCCESS: Dropped duplicates. \nThe shape of the data is: {df.shape}")
+    logging.info(
+        f"SUCCESS: Dropped duplicates. \nThe shape of the data is: {df.shape}")
 
     # Remove all spaces from the column names
     df.columns = df.columns.str.replace(' ', '')
@@ -108,8 +121,9 @@ def clean_data(df):
     # Also replace the '-' with '_'
     df.columns = df.columns.str.replace('-', '_')
 
-    # Drop the education column and columns that were not important based on feature importance
-    df.drop(columns = ['education', 'sex', 'native_country', 'fnlgt', 'race'], 
+    # Drop the education column and columns that were not important based on
+    # feature importance
+    df.drop(columns=['education', 'sex', 'native_country', 'fnlgt', 'race'],
             axis=1, inplace=True)
 
     # Write the cleaned data to a new file
@@ -120,17 +134,32 @@ def clean_data(df):
 
 def feature_engineering(data):
     """
-    This function sets up and runs the pipeline for feature engineering and model training.
+    Sets up and runs the pipeline for feature engineering and model training.
+
+    Parameters:
+        data (pandas.DataFrame): The input data containing features and target
+        variable.
+
+    Returns:
+        tuple: A tuple containing the preprocessed features, encoded target
+        variable, and the pipeline.
+
+    Raises:
+        None
+
+    Example:
+        X, y_encoded, pipeline = feature_engineering(data)
     """
 
     # Identify categorical features excluding the target variable
-    categorical_features = data.select_dtypes(include='object').columns.tolist()
+    categorical_features = data.select_dtypes(
+        include='object').columns.tolist()
     categorical_features.remove('salary')  # Exclude the target variable
-    
+
     # Separate features and target variable
     X = data.drop(columns=['salary'])
     y = data['salary']
-    
+
     # Label encode the target variable
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(y)
@@ -138,36 +167,51 @@ def feature_engineering(data):
     # Define preprocessing for categorical features
     preprocessor = ColumnTransformer(
         transformers=[
-            ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features),
-            # No scaling for quantitative features as they are passed through directly
-        ],
-        remainder='passthrough'  # This will pass through the quantitative features as they are
+            ('cat', OneHotEncoder(handle_unknown='ignore'),
+             categorical_features)
+             ],
+        remainder='passthrough'  # Passes quantitative features as they are
     )
 
     # SMOTENC expects the indices of the categorical features, not their names
-    categorical_indices = [X.columns.get_loc(col) for col in categorical_features]
+    categorical_indices = [X.columns.get_loc(
+        col) for col in categorical_features]
 
     # Create the pipeline with SMOTENC
     pipeline = ImbPipeline(steps=[
         ('preprocessor', preprocessor),
-        ('smote', SMOTENC(categorical_features=categorical_indices, random_state=42)),
+        ('smote', SMOTENC(categorical_features=categorical_indices,
+                          random_state=42)),
         ('classifier', GradientBoostingClassifier())
     ])
 
     # Save the label encoder
     joblib.dump(label_encoder, config['models']['label_encoder'])
-    
+
     return X, y_encoded, pipeline
 
 
 def find_best_model(X, y_encoded, pipeline):
     """
-    This function performs train/test split, k-fold cross-validation with stratification,
-    and returns the best model.
+    Perform train/test split, k-fold cross-validation with stratification, and
+    return the best model.
+
+    Parameters:
+        X (array-like): The input features.
+        y_encoded (array-like): The encoded target variable.
+        pipeline (object): The pipeline object containing the classifier.
+
+    Returns:
+        tuple: A tuple with the test features and test target variables.
+
+    Raises:
+        None
     """
+
     # Split the data into training and testing sets with stratification
-    X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded)
-    
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded)
+
     # Define the parameter grid for GridSearchCV
     param_grid = {
         'classifier__n_estimators': [200],
@@ -176,24 +220,26 @@ def find_best_model(X, y_encoded, pipeline):
         'classifier__min_samples_split': [5],
         'classifier__min_samples_leaf': [4]
     }
-    
+
     # Define stratified k-fold cross-validation
-    stratified_kfold = StratifiedKFold(n_splits=4, shuffle=True, random_state=42)
-    
+    stratified_kfold = StratifiedKFold(
+        n_splits=4, shuffle=True, random_state=42)
+
     # Perform GridSearchCV with stratification
     grid_search = GridSearchCV(estimator=pipeline,
                                param_grid=param_grid,
-                               cv=stratified_kfold,  # Stratified K-Fold cross-validation
+                               cv=stratified_kfold,
                                scoring='f1',  # Evaluation metric
                                n_jobs=-1,  # Use all available cores
                                verbose=4)  # Verbosity level
-    
+
     # Fit GridSearchCV
     grid_search.fit(X_train, y_train)
-    
+
     # Get the best model
     best_model = grid_search.best_estimator_
-    logging.info(f"SUCCESS: Best model found with the following parameters: {grid_search.best_params_}")
+    logging.info(f"SUCCESS: Best model found with the following parameters: \
+    {grid_search.best_params_}")
 
     # Extract the fitted SMOTENC and transform the training data
     smote = best_model.named_steps['smote']
@@ -202,23 +248,29 @@ def find_best_model(X, y_encoded, pipeline):
     # Log the shape of the resampled data
     logging.info(f"Shape of X_resampled after SMOTENC: {X_resampled.shape}")
     logging.info(f"Shape of y_resampled after SMOTENC: {y_resampled.shape}")
-    logging.info(f"Percentage of 0s: {y_resampled.sum() / y_resampled.shape[0]}")
-    logging.info(f"Percentage of 1s: {(y_resampled.shape[0] - y_resampled.sum()) / y_resampled.shape[0]}")
+    logging.info(
+        f"Percentage of 0s: {y_resampled.sum() / y_resampled.shape[0]}")
+    logging.info(
+        f"Percentage of 1s: \
+        {(y_resampled.shape[0] - y_resampled.sum()) / y_resampled.shape[0]}")
 
-    # Write the resampled data to disk. We will use it for data distribution monitoring.
-    pd.DataFrame(X_resampled).to_csv(config['data']['resampled_data'], index=False)
-   
+    # Write the resampled data to disk. We will use it for data distribution
+    # monitoring.
+    pd.DataFrame(X_resampled).to_csv(
+        config['data']['resampled_data'], index=False)
+
     # Save the best model
     joblib.dump(best_model, config['models']['best_model'])
-    
+
     return X_test, y_test
+
 
 def inference_batch(X_test, y_test):
     """
     This function performs inference on the test set using the trained model.
 
     Parameters:
-    - test_data: DataFrame containing the features of the test set without the target variable.
+    - X_test: DataFrame containing the dependent features of the test set.
     - y_test: The target variable of the test set.
 
     Returns:
@@ -233,8 +285,8 @@ def inference_batch(X_test, y_test):
     predictions = best_model.predict(X_test)
 
     # Log the predictions and classification report
-    logging.info(f"SUCCESS: Predictions made on the test set")
-    logging.info(f"SUCCESS: Classification Report:")
+    logging.info("SUCCESS: Predictions made on the test set")
+    logging.info("SUCCESS: Classification Report:")
     logging.info(f"{classification_report(y_test, predictions)}")
 
     return predictions, best_model
@@ -242,10 +294,10 @@ def inference_batch(X_test, y_test):
 
 def inference(features):
     """
-    This function performs inference on a single data sample using the trained model.
+    Performs inference on a single data sample using the trained model.
 
     Parameters:
-    - features: Dictionary containing the features for which predictions are to be made.
+    - features: Dictionary containing the dependent features.
 
     Returns:
     - prediction: The predicted label for the input data.
@@ -279,18 +331,23 @@ def feat_import(X, best_model):
 
     Raises:
     None
+
+    Writes:
+    - A bar chart showing the feature importance to the 'ml' directory.
     """
 
     # Calculate the feature importance of the best model
-    feature_importance = best_model.named_steps['classifier'].feature_importances_
+    importances = best_model.named_steps['classifier'].feature_importances_
 
     # Get the preprocessor from the pipeline
     preprocessor = best_model.named_steps['preprocessor']
 
     # Get feature names for categorical features
-    categorical_features = preprocessor.transformers_[0][2]  # This is the categorical features list
+    categorical_features = preprocessor.transformers_[
+        0][2]  # This is the categorical features list
     categorical_transformer = preprocessor.named_transformers_['cat']
-    categorical_feature_names = list(categorical_transformer.get_feature_names_out(categorical_features))
+    categorical_feature_names = list(
+        categorical_transformer.get_feature_names_out(categorical_features))
 
     # Get numeric feature names from X
     numerical_features = X.select_dtypes(include='number').columns.tolist()
@@ -300,27 +357,31 @@ def feat_import(X, best_model):
 
     # Create a DataFrame to map feature importance to feature names
     feature_importance_df = pd.DataFrame({
-        'Feature': all_feature_names, 
-        'Importance': feature_importance
+        'Feature': all_feature_names,
+        'Importance': importances
     })
 
-    # Collapse the feature importance by summing the importance of one-hot encoded features
+    # Collapse the feature importance by summing the importance of one-hot
+    # encoded features
     def collapse_feature_name(name):
         for original_feature in categorical_features:
             if name.startswith(original_feature):
                 return original_feature
         return name
 
-    feature_importance_df['Collapsed Feature'] = feature_importance_df['Feature'].apply(collapse_feature_name)
+    feature_importance_df['Collapsed Feature'] = feature_importance_df[
+        'Feature'].apply(collapse_feature_name)
 
-    collapsed_importance = feature_importance_df.groupby('Collapsed Feature').sum().reset_index()
+    collapsed_importance = feature_importance_df.groupby(
+        'Collapsed Feature').sum().reset_index()
 
     # Sort by importance
-    collapsed_importance = collapsed_importance.sort_values('Importance', ascending=False)
+    collapsed_importance = collapsed_importance.sort_values(
+        'Importance', ascending=False)
 
     # Create a bar chart to visualize the feature importance
     plt.figure(figsize=(10, 6))
-    plt.bar(collapsed_importance['Collapsed Feature'], 
+    plt.bar(collapsed_importance['Collapsed Feature'],
             collapsed_importance['Importance'])
     plt.xticks(rotation=60)
     plt.xlabel('Feature')
@@ -332,11 +393,17 @@ def feat_import(X, best_model):
 
 def quality_metrics(y_test, predictions):
     """
-    This function produces the confusion matrix, classification report, and ROC curve.
+    Produces the confusion matrix, classification report, and ROC curve.
 
     Parameters:
     - y_test: The true labels of the test set.
     - predictions: The predicted labels for the test set.
+
+    Returns:
+    None
+
+    Writes:
+    - A confusion matrix and ROC curve to the 'ml' directory.
     """
 
     # Calculate confusion matrix
@@ -344,14 +411,14 @@ def quality_metrics(y_test, predictions):
 
     # Create a heatmap of the confusion matrix
     plt.figure(figsize=(8, 6))
-    ax = sns.heatmap(cm, annot=False, cmap='Blues', 
-                    xticklabels=['Predicted  <=50K', 'Predicted  >50K'], 
-                    yticklabels=['True  <=50K', 'True  >50K'])
+    ax = sns.heatmap(cm, annot=False, cmap='Blues',
+                     xticklabels=['Predicted  <=50K', 'Predicted  >50K'],
+                     yticklabels=['True  <=50K', 'True  >50K'])
 
     # Annotate the numbers on the heatmap with green color
     for i in range(len(cm)):
         for j in range(len(cm[i])):
-            ax.text(j + 0.5, i + 0.5, str(cm[i][j]), 
+            ax.text(j + 0.5, i + 0.5, str(cm[i][j]),
                     ha='center', va='center', color='green')
 
     # Set title
@@ -389,6 +456,9 @@ def evaluate_model_slices():
 
     Returns:
     - results_df: A DataFrame containing performance metrics for each slice.
+
+    Writes:
+    - A CSV file containing the results to the 'ml' directory.
     """
     # Load the cleaned_data from disk
     data = pd.read_csv(config['data']['cleaned_data_path'])
@@ -403,7 +473,8 @@ def evaluate_model_slices():
     preprocessor = best_model.named_steps['preprocessor']
 
     # Get feature names for categorical features
-    categorical_features = preprocessor.transformers_[0][2]  # This is the categorical features list
+    categorical_features = preprocessor.transformers_[
+        0][2]  # This is the categorical features list
 
     # Initialize a list to store the results
     results = []
@@ -426,11 +497,13 @@ def evaluate_model_slices():
             predictions = best_model.predict(X_slice)
 
             # Calculate performance metrics
-            report = classification_report(y_slice, predictions, output_dict=True)
+            report = classification_report(
+                y_slice, predictions, output_dict=True)
             try:
                 auc = roc_auc_score(y_slice, predictions)
             except ValueError as e:
-                logging.info(f"Error occurred on {feature}, {value}: \n {str(e)}")
+                logging.info(
+                    f"Error occurred on {feature}, {value}: \n {str(e)}")
                 auc = 0
 
             # Append results to the list
@@ -462,12 +535,17 @@ def evaluate_model_slices():
 
 def log_end(config, start_time):
     """
-    This function logs the end of the run and updates the CSV file with the end time and elapsed time.
-    Both formatted and unformatted start and end times are written to the CSV.
+    This function logs the end of the run and updates the CSV file with the end
+    time and elapsed time. Both formatted and unformatted start and end times
+    are written to the CSV.
 
     Args:
         config (dict): Configuration dictionary containing file paths.
         start_time (datetime): The start time of the run.
+
+    Writes:
+        - A new CSV file with the start time, end time, and elapsed time in the
+        'ml' directory.
 
     Returns:
         end_time (datetime): The end time of the run.
@@ -526,41 +604,47 @@ if __name__ == "__main__":
     logging.info(f"SUCCESS: Run started at: {datetime.now()}")
 
     # Set up argument parser
-    parser = argparse.ArgumentParser(description='Set up the working environment for the model.')
-    parser.add_argument('working_directory', type=str, nargs='?', 
+    parser = argparse.ArgumentParser(
+        description='Set up the working environment for the model.')
+    parser.add_argument('working_directory', type=str, nargs='?',
                         default='/mnt/d/GitHub/FastAPI_Heroku_CICD/starter',
                         help='The path to the working directory')
     args = parser.parse_args()
 
     # Setup the environment
     config = setup_env(args.working_directory)
-    logging.info(f'SUCCESS: Current working directory is set to: {os.getcwd()}')
+    logging.info(
+        f'SUCCESS: Current working directory is set to: {os.getcwd()}')
 
     # Read the data
     data = load_data()
-    logging.info(f"SUCCESS: Data loaded from {config['data']['raw_data_path']}")
+    logging.info(
+        f"SUCCESS: Data loaded from {config['data']['raw_data_path']}")
     logging.info(f"The shape of the data is: {data.shape}")
 
     # Clean the data
     data = clean_data(data)
-    logging.info(f"SUCCESS: Cleaned data written to {config['data']['cleaned_data_path']}")
+    logging.info(
+        f"SUCCESS: Cleaned data written to \
+    {config['data']['cleaned_data_path']}")
     logging.info(f"The shape of the data is: {data.shape}")
 
     # Feature engineer the data
     df = pd.read_csv(config['data']['cleaned_data_path'])
     X, y_encoded, pipeline = feature_engineering(df)
-    logging.info(f"SUCCESS: Feature engineering pipeline set up.")
+    logging.info("SUCCESS: Feature engineering pipeline set up.")
 
     # Find the best model
     X_test, y_test = find_best_model(X, y_encoded, pipeline)
-    logging.info(f"SUCCESS: Best model found and saved to {config['models']['best_model']}")
+    logging.info(f"SUCCESS: Best model found and saved to \
+    {config['models']['best_model']}")
 
     # Perform inference on the test data
     predictions, best_model = inference_batch(X_test, y_test)
-    logging.info(f"SUCCESS: Inference completed on the test set.")
+    logging.info("SUCCESS: Inference completed on the test set.")
 
     # Perform inference on a single example
-    dict = {'age': 39, 
+    dict = {'age': 39,
             'workclass': 'Local-gov',
             'education_num': 13,
             'marital_status': 'Never-married',
@@ -572,20 +656,22 @@ if __name__ == "__main__":
             }
     single_prediction = inference(dict)
     # Log the prediction
-    logging.info(f"SUCCESS: Prediction made for single example of input features: {dict} is: {single_prediction}")
+    logging.info(f"SUCCESS: Prediction made for single row of input: {dict} \
+is: {single_prediction}")
 
     # Calculate feature importance
     feat_import(X, best_model)
-    logging.info(f"SUCCESS: Feature importance calculated and visualized.")
+    logging.info("SUCCESS: Feature importance calculated and visualized.")
 
     # Quality metrics
     quality_metrics(y_test, predictions)
-    logging.info(f"SUCCESS: Quality metrics calculated and visualized.")
+    logging.info("SUCCESS: Quality metrics calculated and visualized.")
 
     # Evaluate model slices
-    logging.info(f"SUCCESS: Model slices evaluated.")
+    logging.info("SUCCESS: Model slices evaluated.")
     results_df = evaluate_model_slices()
 
     # Log the end of the run
     end_time, elapsed_time = log_end(config, start_time)
-    logging.info(f"SUCCESS: Run ended at: {end_time} with an elapsed time of: {elapsed_time}")
+    logging.info(f"SUCCESS: Run ended at: \
+{end_time} with an elapsed time of: {elapsed_time}")

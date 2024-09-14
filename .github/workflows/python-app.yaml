@@ -1,0 +1,54 @@
+name: Python Flake8 and Pytest
+
+on:
+  push:
+    branches:
+      - main  # Adjust this to the name of your default branch if needed
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Run Flake8
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'  # or any other version you prefer
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Install from requirements.txt
+
+      - name: Run flake8
+        run: |
+          flake8 .
+
+  test:
+    name: Run Pytest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'  # or any other version you prefer
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Install from requirements.txt
+
+      - name: Run pytest
+        run: |
+          pytest
