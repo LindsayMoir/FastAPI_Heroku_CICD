@@ -15,7 +15,7 @@ def setup_environment():
     working_directory = '/mnt/d/GitHub/FastAPI_Heroku_CICD/starter'
 
     # Call the setup_env function to set up the environment and load the config
-    config = setup_env(working_directory)
+    # config = setup_env(working_directory)
 
     # Print the current working directory for verification
     print(f"Working directory set to: {os.getcwd()}")
