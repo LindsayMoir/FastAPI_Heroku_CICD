@@ -6,4 +6,3 @@ def test_load_data_shape(data):
 
     # Assert the number of columns is 15
     assert data.shape[1] == 15, "The number of columns should be equal to 15."
-    
