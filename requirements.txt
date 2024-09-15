@@ -8,3 +8,5 @@ uvicorn
 gunicorn
 flake8
 imblearn
+matplotlib
+seaborn
