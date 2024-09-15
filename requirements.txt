@@ -7,4 +7,4 @@ fastapi
 uvicorn
 gunicorn
 flake8
-SMOTENC
+imblearn
