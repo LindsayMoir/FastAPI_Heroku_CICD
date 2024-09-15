@@ -1,0 +1,35 @@
+# config.yaml
+
+# File paths
+data:
+  raw_data_path: "data/census.csv"
+  cleaned_data_path: "data/cleaned_data.csv"
+  resampled_data: "data/resampled_data.csv"
+  describe_data_path: "data/describe_cleaned_data.csv"
+
+files:
+  working_directory: '/mnt/d/GitHub/FastAPI_Heroku_CICD/starter'
+  log_file: 'logs/ml.log'
+  run_log: 'logs/run_statistics.csv'
+
+models:
+  best_model: 'ml/best_model.pkl'
+  label_encoder: 'ml/label_encoder.pkl'
+  confusion_matrix: 'ml/confusion_matrix.png'
+  feature_importance: 'ml/feature_importance.png'
+  roc_curve: 'ml/roc_curve.png'
+  slice_results: 'ml/slice_results.csv'
+
+# Expected columns
+columns:
+  expected: 
+    - 'age'
+    - 'workclass'
+    - 'education_num'
+    - 'marital_status'
+    - 'occupation'
+    - 'relationship'
+    - 'capital_gain'
+    - 'capital_loss'
+    - 'hours_per_week'
+    - 'salary'
