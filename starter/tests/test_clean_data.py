@@ -23,15 +23,22 @@ def test_clean_data(data):
 
     # Create a describe dataframe for the resampled_data
     resampled_describe_df = resampled_data.describe()
-    resampled_describe_df = resampled_describe_df.iloc[1:, :]  # remove the count row
+
+    # remove the count row
+    resampled_describe_df = resampled_describe_df.iloc[
+        1:, :].reset_index(drop=True)
+
     # Smote skewed these columns a lot
-    resampled_describe_df.drop(columns = ['capital_gain', 'capital_loss'], inplace = True) 
+    resampled_describe_df.drop(columns=['capital_gain', 'capital_loss'],
+                               inplace=True)
 
     # Get the describe_df of the cleaned data
-    describe_df = pd.read_csv(config['data']['describe_data_path'], index_col=0)
+    describe_df = pd.read_csv(config['data']['describe_data_path'],
+                              index_col=0)
     describe_df = describe_df.iloc[1:, :]  # remove the count row
     # Smote skewed these columns a lot. So, you need to drop them.
-    describe_df.drop(columns = ['capital_gain', 'capital_loss'], inplace = True)
+    describe_df.drop(columns=['capital_gain', 'capital_loss'],
+                     inplace=True)
 
     # Calculate the absolute percentage difference
     diff = ((resampled_describe_df - describe_df) / describe_df).abs()
@@ -44,8 +51,10 @@ def test_clean_data(data):
         messages = []
         for row, col in zip(offside_cells[0], offside_cells[1]):
             messages.append(
-                f"Value offside at row '{resampled_describe_df.index[row]}', column '{resampled_describe_df.columns[col]}': "
-                f"resampled = {resampled_describe_df.iloc[row, col]}, original = {describe_df.iloc[row, col]}, "
+                f"Value offside at row '{resampled_describe_df.index[row]}', \
+                column '{resampled_describe_df.columns[col]}': "
+                f"resampled = {resampled_describe_df.iloc[row, col]}, \
+                original = {describe_df.iloc[row, col]}, "
                 f"diff = {diff.iloc[row, col]:.2%}"
             )
         # Fail the test with detailed messages
