@@ -1,3 +1,5 @@
+"""Configuration file for pytest."""
+
 import pytest
 import os
 import sys
