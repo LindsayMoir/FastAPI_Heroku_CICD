@@ -8,7 +8,12 @@ Working in a command line environment is recommended for ease of use with git an
 
 ## FastAPI
 
-### Run Inference (Post)
+### Start Web Server
+Get in the directory where main.py is. It is under the root directory (FastAPI_Heroku_CICD). Then run this command
+uvicorn main:app --reload
+This starts the web server
+
+### Run Inference (Post) Using Curl
 curl -X 'POST' \
   'http://127.0.0.1:8000/predict' \
   -H 'Content-Type: application/json' \
@@ -25,6 +30,15 @@ curl -X 'POST' \
   }'
 #### Expected Prediction
 {"prediction":"<=50K"}
+
+### Run Inference (Post) Using requests
+With the web server still running as above (Start Web Server)
+Get in the root directory FastAPI_Heroku_CICD/
+Run this command:
+python requests_post_predict.py
+
+#### Expected Prediction
+{"prediction":">50K"} 
 
 ## Repositories
 
