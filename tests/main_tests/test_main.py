@@ -2,7 +2,7 @@ import os
 import sys
 from fastapi.testclient import TestClient
 
-# Add parent directory (2 levels above) to sys.path so 'model' can be imported
+# Add parent directory (2 levels above) to sys.path so 'main.py' can be imported
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(
     __file__), '../../')))
 
