@@ -11,7 +11,7 @@ from main import app  # noqa: E402
 client = TestClient(app)
 
 
-def test_post_inference_valid():
+def test_post_inference_low():
     payload = {
         "age": 39,
         "workclass": "State-gov",
@@ -31,3 +31,25 @@ def test_post_inference_valid():
     # Check the response
     prediction = response.json().get("prediction")
     assert prediction == "<=50K", f"Unexpected prediction value: {prediction}"
+
+
+def test_post_inference_high():
+    payload = {
+        "age": 52,
+        "workclass": "Self-emp-not-inc",
+        "education_num": 13,
+        "marital_status": "Married-civ-spouse",
+        "occupation": "Exec-managerial",
+        "relationship": "Husband",
+        "capital_gain": 15000,
+        "capital_loss": 0,
+        "hours_per_week": 45
+    }
+
+    # Get the response from the API
+    response = client.post("/predict", json=payload)
+    assert response.status_code == 200
+
+    # Check the response
+    prediction = response.json().get("prediction")
+    assert prediction == ">50K", f"Unexpected prediction value: {prediction}"
