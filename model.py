@@ -302,7 +302,7 @@ def inference(features):
     Returns:
     - prediction: The predicted label for the input data.
     """
-    # We are running this standalone. It needs the config file. 
+    # We are running this standalone. It needs the config file.
     with open('config/config.yaml', 'r') as file:
         config = yaml.safe_load(file)
 
