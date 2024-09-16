@@ -5,7 +5,8 @@ import os
 import sys
 
 # Add parent directory (one level above) to sys.path so 'model' can be imported
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(
+    __file__), '../../')))
 
 # Import setup_env and load_data after modifying sys.path
 from model import setup_env, load_data  # noqa: E402
@@ -16,7 +17,7 @@ def setup_environment():
     """Fixture to set up the environment before tests."""
 
     # Set the working directory (adjust according to your project structure)
-    wd = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    wd = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 
     # Call the setup_env function to set up the environment and load the config
     config = setup_env(wd)

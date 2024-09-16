@@ -6,6 +6,26 @@ Working in a command line environment is recommended for ease of use with git an
     * conda create -n [envname] "python=3.8" scikit-learn dvc pandas numpy pytest jupyter jupyterlab fastapi uvicorn -c conda-forge
     * Install git either through conda (“conda install git”) or through your CLI, e.g. sudo apt-get git.
 
+## FastAPI
+
+### Run Inference (Post)
+curl -X 'POST' \
+  'http://127.0.0.1:8000/predict' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "age": 39,
+    "workclass": "State-gov",
+    "education_num": 13,
+    "marital_status": "Never-married",
+    "occupation": "Adm-clerical",
+    "relationship": "Not-in-family",
+    "capital_gain": 2174,
+    "capital_loss": 0,
+    "hours_per_week": 40
+  }'
+#### Expected Prediction
+{"prediction":"<=50K"}
+
 ## Repositories
 
 * Create a directory for the project and initialize Git and DVC.
