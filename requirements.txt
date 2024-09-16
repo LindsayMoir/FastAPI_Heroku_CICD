@@ -11,3 +11,4 @@ imblearn
 matplotlib
 seaborn
 PyYAML
+httpx
