@@ -1,10 +1,10 @@
 import requests
 import json
 
-# Default url for the FastAPI app
+# Default URL for the FastAPI app
 url = "http://127.0.0.1:8000/predict"
 
-# data to send in the POST request
+# Data to send in the POST request
 data = {
     "age": 52,
     "workclass": "Self-emp-not-inc",
@@ -30,10 +30,10 @@ try:
     if response.status_code == 200:
         # Parse the JSON response from the FastAPI app
         result = response.json()
+        prediction = result.get("prediction", "No prediction found")
         print(f"Response from FastAPI: {result}")
     else:
-        print(f"Failed to get a successful response. Status code: \
-        {response.status_code}")
+        print(f"Failed to get a successful response. Status code: {response.status_code}")
         print(f"Response content: {response.text}")
 
 except requests.exceptions.RequestException as e:

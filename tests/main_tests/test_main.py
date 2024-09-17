@@ -2,7 +2,7 @@ import os
 import sys
 from fastapi.testclient import TestClient
 
-# Add parent directory (2 levels above) to sys.path so 'main.py' can be imported
+# Add parent directory (2 levels above) to sys.path so 'main.py' is imported
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(
     __file__), '../../')))
 
@@ -65,3 +65,20 @@ def test_post_inference_high():
     # Check the response
     prediction = response.json().get("prediction")
     assert prediction == ">50K", f"Unexpected prediction value: {prediction}"
+
+
+def test_predict_missing_field():
+    features = {
+        "age": 35,
+        "workclass": "Private",
+        "education_num": 13,
+        # "marital_status" is missing
+        "occupation": "Tech-support",
+        "relationship": "Husband",
+        "capital_gain": 5000,
+        "capital_loss": 0,
+        "hours_per_week": 40
+    }
+
+    response = client.post("/predict", json=features)
+    assert response.status_code == 422  # Unprocessable entity (missing field)
