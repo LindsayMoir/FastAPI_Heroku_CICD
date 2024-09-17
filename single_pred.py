@@ -1,8 +1,9 @@
-import requests
 import json
+import os
+import requests
 
-# Default URL for the FastAPI app
-url = "http://127.0.0.1:8000/predict"
+# Get the base URL from the environment variable or default to localhost
+url = os.getenv("FASTAPI_URL", "http://127.0.0.1:8000/predict")
 
 # Data to send in the POST request
 data = {
