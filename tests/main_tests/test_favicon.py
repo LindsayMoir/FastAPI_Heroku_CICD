@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 import os
 import sys
 
-# Add parent directory (2 levels above) to sys.path so 'main.py' can be imported
+# Add parent directory (2 levels above) to sys.path so main.py can be imported
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(
     __file__), '../../')))
 
@@ -10,12 +10,13 @@ from main import app  # noqa: E402
 
 client = TestClient(app)
 
+
 def test_favicon_exists():
     response = client.get("/favicon.ico")
-    assert response.status_code == 200  # Ensure the favicon endpoint is available
+    assert response.status_code == 200  # Ensure the favicon endpoint exists
 
     # Check the content type
-    assert response.headers["content-type"] in ["image/x-icon", 
+    assert response.headers["content-type"] in ["image/x-icon",
                                                 "image/vnd.microsoft.icon"]
     assert len(response.content) > 0  # Ensure it's not an empty file
 

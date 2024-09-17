@@ -33,7 +33,8 @@ try:
         prediction = result.get("prediction", "No prediction found")
         print(f"Response from FastAPI: {result}")
     else:
-        print(f"Failed to get a successful response. Status code: {response.status_code}")
+        print(f"Failed to get a successful response. Status code: \
+        {response.status_code}")
         print(f"Response content: {response.text}")
 
 except requests.exceptions.RequestException as e:
