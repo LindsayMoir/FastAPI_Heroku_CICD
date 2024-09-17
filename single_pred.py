@@ -12,7 +12,7 @@ data = {
     "marital_status": "Married-civ-spouse",
     "occupation": "Exec-managerial",
     "relationship": "Husband",
-    "capital_gain": 15000,
+    "capital_gain": 14000,
     "capital_loss": 0,
     "hours_per_week": 45
 }
