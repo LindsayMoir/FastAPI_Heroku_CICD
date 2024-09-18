@@ -1,10 +1,17 @@
 import json
 import os
 import requests
+import yaml
+
+with open('config/config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
+
+# Extract the log file path from the configuration
+log_file_path = config['files']['log_file']
 
 # Define the URLs
-heroku_url = "https://income-projection-61635563fc60.herokuapp.com/predict"
-local_url = "http://127.0.0.1:8000/predict"
+heroku_url = config['urls']['heroku_url']
+local_url = config['urls']['local_url']
 
 # Get the base URL from the environment variable or default to Heroku URL
 url = os.getenv("FASTAPI_URL", heroku_url)
@@ -46,7 +53,7 @@ def send_request(url, data, headers):
             return None, f"Failed to get a successful response. Status code: \
             {response.status_code}"
     except requests.exceptions.RequestException:
-        # Handle any exceptions that occur during the request
+        # Handle any exceptions that occurs during the request
         return None, "An error occurred while sending the request."
 
 
@@ -59,9 +66,11 @@ if error:
     print("Error:", error)
     print("Falling back to local server:", local_url)
     result, error = send_request(local_url, data, headers)
+else:
+    print("This prediction is from Heroku")
 
-# Print the result from the local server
+# Print the result
 if result:
-    print(f"Response from FastAPI: {result}")
+    print(f"Response using FastAPI: {result}")
 else:
     print("Failed to get a response from both Heroku and local servers.")

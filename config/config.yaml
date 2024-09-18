@@ -33,3 +33,7 @@ columns:
     - 'capital_loss'
     - 'hours_per_week'
     - 'salary'
+
+urls:
+  heroku_url: "https://income-projection-61635563fc60.herokuapp.com/predict"
+  local_url: "http://127.0.0.1:8000/predict"
