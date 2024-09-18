@@ -27,6 +27,7 @@ headers = {
     "Content-Type": "application/json"
 }
 
+
 def send_request(url, data, headers):
     try:
         # Make the POST request to the FastAPI app with the data
@@ -42,10 +43,12 @@ def send_request(url, data, headers):
             return None, "Heroku is currently unavailable."
         else:
             # Handle other response codes
-            return None, f"Failed to get a successful response. Status code: {response.status_code}"
+            return None, f"Failed to get a successful response. Status code: \
+            {response.status_code}"
     except requests.exceptions.RequestException:
         # Handle any exceptions that occur during the request
         return None, "An error occurred while sending the request."
+
 
 # Try sending the request to Heroku first
 print('Trying Heroku URL:', heroku_url)
