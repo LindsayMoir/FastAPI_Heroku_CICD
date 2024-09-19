@@ -532,7 +532,9 @@ def evaluate_model_slices():
     results_df = results_df.sort_values(by='f1-score', ascending=False)
 
     # Write resuls to disk
-    results_df.to_csv(config['models']['slice_results'], index=False)
+    results_df.to_csv(config['models']['slice_results'],
+                      sep='\t',
+                      index=False)
 
     return results_df
 
