@@ -67,7 +67,7 @@ if error:
     print("Falling back to local server:", local_url)
     result, error = send_request(local_url, data, headers)
 else:
-    print("This prediction is from Heroku")
+    print("This prediction is from Heroku:", heroku_url)
 
 # Print the result
 if result:

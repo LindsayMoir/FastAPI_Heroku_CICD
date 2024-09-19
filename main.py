@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from starlette.responses import RedirectResponse
+from typing import Dict
 import uvicorn
 import model  # Assuming 'model.py' contains your inference logic
 
@@ -44,7 +45,7 @@ class Features(BaseModel):
 
 
 @app.get("/")
-def read_root():
+def read_root() -> dict:
     message = "Deploying a ML Model with GBC, FastAPI, Heroku, and DVC"
     logger.info(f"Root accessed. Message: {message}")
     return {"message": message}
@@ -52,12 +53,21 @@ def read_root():
 
 # Provide the favicon route
 @app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
+async def favicon() -> RedirectResponse:
     return RedirectResponse(url="/static/favicon.ico")
 
 
 @app.post("/predict")
-def predict(features: Features):
+def predict(features: Features) -> Dict[str, str]:
+    """
+    Predict the income category based on the provided features.
+
+    Args:
+        features (Features): The input data model containing the values.
+
+    Returns:
+        Dict[str, str]: A dictionary with the prediction result.
+    """
     try:
         # Perform inference using the model.inference function
         prediction = model.inference(features.model_dump())
@@ -66,8 +76,8 @@ def predict(features: Features):
         return {"prediction": prediction}
     except Exception as e:
         logger.error(f"Inference failed: {e}")
-        raise HTTPException(status_code=500, detail=f"Inference failed: \
-        {str(e)}")
+        raise HTTPException(status_code=500,
+                            detail=f"Inference failed: {str(e)}")
 
 
 if __name__ == "__main__":
