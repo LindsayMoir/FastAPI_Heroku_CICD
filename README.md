@@ -1,5 +1,7 @@
 Working in a command line environment is recommended for ease of use with git and dvc. If on Windows, WSL1 or 2 is recommended.
 
+This respository can be found at https://github.com/LindsayMoir/FastAPI_Heroku_CICD
+
 # Environment Set up
 * Download and install conda if you don’t have it already.
     * Use the supplied requirements file to create a new environment, or
@@ -8,12 +10,14 @@ Working in a command line environment is recommended for ease of use with git an
 
 ## FastAPI
 
-### Start Web Server
+### Local Web Server
+
+#### Start Web Server
 Get in the directory where main.py is. It is under the root directory (FastAPI_Heroku_CICD). Then run this command
 uvicorn main:app --reload
 This starts the web server
 
-### Run Inference (Post) Using Curl
+#### Run Inference (Post) Using Curl
 curl -X 'POST' \
   'http://127.0.0.1:8000/predict' \
   -H 'Content-Type: application/json' \
@@ -28,17 +32,47 @@ curl -X 'POST' \
     "capital_loss": 0,
     "hours_per_week": 40
   }'
-#### Expected Prediction
+##### Expected Prediction
 {"prediction":"<=50K"}
 
-### Run Inference (Post) Using requests
+#### Run Inference (Post) Using requests
 With the web server still running as above (Start Web Server)
 Get in the root directory FastAPI_Heroku_CICD/
 Run this command:
-python requests_post_predict.py
+python rsingle_pred.py
 
-#### Expected Prediction
-{"prediction":">50K"} 
+##### Expected Prediction
+{"prediction":">50K"}
+
+### Heroku Web Server
+We have chosen automatic deployment on Heroku for our app. We are connected to GitHub
+to do that. This means every time we push to GitHub, Heroku updates the app that is
+running. 
+Do all of this from terminal
+
+##### Login
+heroku login
+
+##### Lists all apps that you have on Heroku
+heroku apps
+
+##### Supply resources to the app
+heroku ps:scale web=1 --app income-projection
+
+##### Get the status of the app
+heroku ps --app income-projection
+
+##### Open the app in a browser window
+heroku open --app income-projection
+
+##### Make sure you are in root directory
+This will prove that the app is working and running on Heroku. Run single_pred.py
+python single_pred.py
+
+##### Scale the app down so it is using 0 resources
+heroku ps:scale web=0 --app income-projection
+
+
 
 ## Repositories
 

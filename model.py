@@ -613,7 +613,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Set up the working environment for the model.')
     parser.add_argument('working_directory', type=str, nargs='?',
-                        default='/mnt/d/GitHub/FastAPI_Heroku_CICD/starter',
+                        default='/mnt/d/GitHub/FastAPI_Heroku_CICD/',
                         help='The path to the working directory')
     args = parser.parse_args()
 
