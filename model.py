@@ -214,11 +214,16 @@ def find_best_model(X, y_encoded, pipeline):
 
     # Define the parameter grid for GridSearchCV
     param_grid = {
-        'classifier__n_estimators': [200],
-        'classifier__learning_rate': [0.1],
-        'classifier__max_depth': [4],
-        'classifier__min_samples_split': [5],
-        'classifier__min_samples_leaf': [4]
+        'classifier__n_estimators': config['hyperparameters']
+                                          ['n_estimators'],
+        'classifier__learning_rate': config['hyperparameters']
+                                           ['learning_rate'],
+        'classifier__max_depth': config['hyperparameters']
+                                       ['max_depth'],
+        'classifier__min_samples_split': config['hyperparameters']
+                                               ['min_samples_split'],
+        'classifier__min_samples_leaf': config['hyperparameters']
+                                              ['min_samples_leaf']
     }
 
     # Define stratified k-fold cross-validation

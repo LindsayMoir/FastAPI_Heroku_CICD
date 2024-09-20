@@ -12,6 +12,13 @@ files:
   log_file: 'logs/ml.log'
   run_log: 'logs/run_statistics.csv'
 
+hyperparameters:
+  n_estimators: [150, 200]
+  learning_rate: [.05, 0.1]
+  max_depth: [4, 5]
+  min_samples_split: [4, 5]
+  min_samples_leaf: [4, 5]
+
 models:
   best_model: 'ml/best_model.pkl'
   label_encoder: 'ml/label_encoder.pkl'
