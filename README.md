@@ -1,12 +1,25 @@
-Working in a command line environment is recommended for ease of use with git and dvc. If on Windows, WSL1 or 2 is recommended.
+# FastAPI Heroku CICD
 
-This respository can be found at https://github.com/LindsayMoir/FastAPI_Heroku_CICD
+## Overview
 
-## Environment Set up
-* Download and install conda if you don’t have it already.
-    * Use the supplied requirements.txt file to create a new environment, or
-    * conda create -n [envname] "python=3.11" scikit-learn dvc pandas numpy pytest jupyter jupyterlab fastapi uvicorn -c conda-forge
-    * Install git either through conda (“conda install git”) or through your CLI, e.g. sudo apt-get git.
+This repository provides an example of deploying a FastAPI machine learning model using Heroku and continuous integration with GitHub Actions. A command-line environment is recommended for ease of use with Git, DVC, and other tools. For Windows users, WSL1 or WSL2 is recommended.
+
+You can find the repository [here](https://github.com/LindsayMoir/FastAPI_Heroku_CICD).
+
+## Environment Setup
+
+### Install Conda
+If you don’t already have it, download and install Conda.
+
+### Set Up the Environment
+
+1. Use the `requirements.txt` file to create a new environment, or
+
+2. Create a new environment manually:
+   
+   ```bash
+   conda create -n [envname] "python=3.11" scikit-learn dvc pandas numpy pytest jupyter jupyterlab fastapi uvicorn -c conda-forge```
+
 
 ## Files
 ./
