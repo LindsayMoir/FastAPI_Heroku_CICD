@@ -5,7 +5,7 @@
 This repository provides an example of deploying a FastAPI machine learning model using Heroku and continuous integration with GitHub Actions. A command-line environment is recommended for ease of use with Git, DVC, and other tools. For Windows users, WSL1 or WSL2 is recommended. The repository does the following:
 - Ingests data, trains a decision tree on that data and makes predictions.
 - It does this in batch mode and also in real time via Heroku.
--Continuous Integration and Continuous Deployment (CICD) is enabled via workflows in GitHub and hooks into Heroku from GitHub.
+- Continuous Integration and Continuous Deployment (CICD) is enabled via workflows in GitHub and hooks into Heroku from GitHub.
 - You can find the repository [here](https://github.com/LindsayMoir/FastAPI_Heroku_CICD).
 
 ## Environment Setup
@@ -31,6 +31,7 @@ If you don’t already have it, download and install Conda.
 
 ## Files
 
+```bash
 ./
 ├── CODEOWNERS
 ├── EDA.ipynb - Initial EDA on data
@@ -86,6 +87,7 @@ If you don’t already have it, download and install Conda.
 └── tests/
     ├── main_tests/
     └── model_tests/
+```
 
 13 directories, 84 files
 
