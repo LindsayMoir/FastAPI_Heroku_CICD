@@ -26,7 +26,7 @@
 This repository provides an example of deploying a FastAPI machine learning model using Heroku and continuous integration with GitHub Actions. A command-line environment is recommended for ease of use with Git, Heroku, and other tools. For Windows users, WSL1 or WSL2 is recommended. The repository does the following:
 - Ingests data, trains a decision tree on that data, and makes predictions.
 - It does this in batch mode and also in real time via FastAPI and Heroku.
-- Continuous Integration and Continuous Deployment (CICD) is enabled via workflows in GitHub and hooks into Heroku from GitHub.
+- Continuous Integration and Continuous Deployment (CI/CD) is enabled via workflows in GitHub and hooks into Heroku from GitHub.
 - You can find the repository [here](https://github.com/LindsayMoir/FastAPI_Heroku_CICD).
 
 ## Environment Setup
@@ -123,7 +123,7 @@ GitHub Actions have been implemented. `flake8` and `pytest` are automatically ru
 
 ## Model
 
-The `model.py` script reads, cleans data, trains the model, and performs inference (batch and single prediction).
+The `model.py` script reads, cleans data, trains the model, and performs inference (batch and single prediction). This is the classifiation report. We are using f1 to choose our best_mdodel.
 
 ```bash
 
@@ -260,4 +260,4 @@ There are also many more!
 
 ## Summary
 
-This repository demonstrates how to deploy a machine learning model using FastAPI and Heroku, with integrated continuous integration and deployment (CI/CD) via GitHub Actions. It includes detailed setup instructions, visualizations of model performance, and scripts for training, inference, and web service interaction. Key features include automated data ingestion, real-time predictions, and evaluation of model performance on specific data slices. The README provides a comprehensive guide to setting up the environment, running the model, and deploying the web app on Heroku.
+This repository demonstrates how to deploy a machine learning model using FastAPI and Heroku, with continuous integration and deployment (CI/CD) via GitHub Actions. It includes detailed setup instructions, visualizations of model performance, and scripts for training, inference, and web service interaction. Key features include automated data ingestion, real-time predictions, and evaluation of model performance on specific data slices. This README provides a comprehensive guide to setting up the environment, running the model, and deploying the web app on Heroku.
