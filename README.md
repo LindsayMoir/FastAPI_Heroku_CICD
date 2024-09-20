@@ -1,10 +1,12 @@
 # FastAPI Heroku CICD
 
+![Confusion Matrix](/ml/confusion_matrix.png)
+
 ## Overview
 
-This repository provides an example of deploying a FastAPI machine learning model using Heroku and continuous integration with GitHub Actions. A command-line environment is recommended for ease of use with Git, DVC, and other tools. For Windows users, WSL1 or WSL2 is recommended. The repository does the following:
-- Ingests data, trains a decision tree on that data and makes predictions.
-- It does this in batch mode and also in real time via Heroku.
+This repository provides an example of deploying a FastAPI machine learning model using Heroku and continuous integration with GitHub Actions. A command-line environment is recommended for ease of use with Git, Heroku, and other tools. For Windows users, WSL1 or WSL2 is recommended. The repository does the following:
+- Ingests data, trains a decision tree on that data, and makes predictions.
+- It does this in batch mode and also in real time via FastAPI and Heroku.
 - Continuous Integration and Continuous Deployment (CICD) is enabled via workflows in GitHub and hooks into Heroku from GitHub.
 - You can find the repository [here](https://github.com/LindsayMoir/FastAPI_Heroku_CICD).
 
@@ -61,7 +63,11 @@ If you don’t already have it, download and install Conda.
 ├── ml/
 │   ├── best_model.pkl - Best estimator and INCLUDES pipeline components
 │   ├── confusion_matrix.png
-│   └── feature_importance.png
+│   ├── feature_importance.png
+│   ├── label_encoder.pkl
+│   ├── roc_curve.png
+│   └── slice_output.txt
+
 ├── model.py - Python code that ingests data, cleans data, feature engineers,
                does inference (batch and single predictions), produces visualizations, and statistics
 ├── model_card.md
@@ -72,7 +78,7 @@ If you don’t already have it, download and install Conda.
 │   ├── continuous_deployment.png
 │   ├── continuous_integration.png
 │   ├── example.png
-│   ├──fast_api_post.png
+│   ├── fast_api_post.png
 │   ├── Heroku Login Apps Scale Status Pred Heroku Pred Local.png
 │   ├── Heroku Login.png
 │   ├── Heroku Overview of App Deployment.png
@@ -84,6 +90,8 @@ If you don’t already have it, download and install Conda.
 │   └── sanitycheck_run.png
 ├── setup.py
 ├── single_pred.py - Python code that does inference for one prediction
+└── static/
+    ├── favicon.ico
 └── tests/
     ├── main_tests/
     └── model_tests/
@@ -104,8 +112,10 @@ The `model.py` script reads, cleans data, trains the model, and performs inferen
 - Collects run statistics for every run.
 - Uses a config file for all constants.
 - Utilizes `best_estimator` (best_model) from the pipeline class for inference. Since this is part of the pipeline, feature engineering is handled automatically. The assumption is that any prediction requests will be cleaned by the web service.
-- Calculates and visualizes feature importance.
+- Calculates and visualizes
+![Feature Importance](/ml/feature_importance.png)
 - Produces visualizations (confusion matrix, ROC curve).
+![AUC ROC Curve](/ml/roc_curve.png)
 - Evaluates model slices by analyzing each categorical feature and its unique values, calculating all metrics to assess the impact.
 
 ### To run `model.py` locally:
