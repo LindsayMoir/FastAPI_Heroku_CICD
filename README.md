@@ -2,19 +2,38 @@
 
 ![Confusion Matrix](/ml/confusion_matrix.png)
 
+## Table of Contents
+- [Overview](#overview)
+- [Environment Setup](#environment-setup)
+  - [Install Conda](#install-conda)
+  - [Set Up the Environment](#set-up-the-environment)
+  - [Install Git](#install-git)
+- [Files](#files)
+- [GitHub Actions](#github-actions)
+- [Model](#model)
+  - [Model.py Features](#modelpy-features)
+  - [Run Model.py Locally](#to-run-modelpy-locally)
+- [FastAPI](#fastapi)
+  - [Local Web Server](#local-web-server)
+  - [Run Inference Using Curl](#run-inference-post-using-curl)
+  - [Run Inference Using requests](#run-inference-post-using-requests)
+  - [Heroku Web Server](#heroku-web-server)
+- [Screenshots](#screenshots)
+- [Summary](#summary)
+
 ## Overview
 
 This repository provides an example of deploying a FastAPI machine learning model using Heroku and continuous integration with GitHub Actions. A command-line environment is recommended for ease of use with Git, Heroku, and other tools. For Windows users, WSL1 or WSL2 is recommended. The repository does the following:
 - Ingests data, trains a decision tree on that data, and makes predictions.
 - It does this in batch mode and also in real time via FastAPI and Heroku.
 - Continuous Integration and Continuous Deployment (CICD) is enabled via workflows in GitHub and hooks into Heroku from GitHub.
+![GitHub Actions CI](https://github.com/LindsayMoir/FastAPI_Heroku_CICD/actions/workflows/python-package.yml/badge.svg)
 - You can find the repository [here](https://github.com/LindsayMoir/FastAPI_Heroku_CICD).
 
 ## Environment Setup
 
 ### Install Conda
-
-If you don’t already have it, download and install Conda.
+If you don’t already have it, download and install [Conda here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/).
 
 ### Set Up the Environment
 
@@ -107,10 +126,20 @@ GitHub Actions have been implemented. `flake8` and `pytest` are automatically ru
 
 The `model.py` script reads, cleans data, trains the model, and performs inference (batch and single prediction).
 
+                precision    recall  f1-score   support
+
+           0       0.93      0.90      0.91      4940
+           1       0.70      0.78      0.74      1568
+
+    accuracy                           0.87      6508
+   macro avg       0.82      0.84      0.83      6508
+weighted avg       0.87      0.87      0.87      6508
+
 ### Model.py Features
 
 - Collects run statistics for every run.
 - Uses a config file for all constants.
+- Uses Gradient Boosted Classifier (GBC) ensemble decision tree from sklearn.
 - Utilizes `best_estimator` (best_model) from the pipeline class for inference. Since this is part of the pipeline, feature engineering is handled automatically. The assumption is that any prediction requests will be cleaned by the web service.
 - Calculates and visualizes
 ![Feature Importance](/ml/feature_importance.png)
@@ -174,9 +203,11 @@ python single_pred.py
 ```
 
 ### Heroku Web Server
+
+#### Deploying to Heroku
 This application is deployed using Heroku's automatic deployment feature. Heroku updates the app automatically every time a new commit is pushed to GitHub.
 
-##### Login
+##### Login to Heroku
 ```bash
 heroku login
 ```
@@ -211,3 +242,20 @@ python single_pred.py
 ```bash
 heroku ps:scale web=0 --app income-projection
 ```
+
+## Screenshots
+
+- Continuous Deployment:  
+  ![Continuous Deployment](/screenshots/continuous_deployment.png)
+
+- Continuous Integration:  
+  ![Continuous Integration](/screenshots/continuous_integration.png)
+
+- Example FastAPI POST Request:  
+  ![FastAPI POST Example](/screenshots/fast_api_post.png)
+
+There are also many more!
+
+## Summary
+
+This repository demonstrates how to deploy a machine learning model using FastAPI and Heroku, with integrated continuous integration and deployment (CI/CD) via GitHub Actions. It includes detailed setup instructions, visualizations of model performance, and scripts for training, inference, and web service interaction. Key features include automated data ingestion, real-time predictions, and evaluation of model performance on specific data slices. The README provides a comprehensive guide to setting up the environment, running the model, and deploying the web app on Heroku.
