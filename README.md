@@ -27,7 +27,6 @@ This repository provides an example of deploying a FastAPI machine learning mode
 - Ingests data, trains a decision tree on that data, and makes predictions.
 - It does this in batch mode and also in real time via FastAPI and Heroku.
 - Continuous Integration and Continuous Deployment (CICD) is enabled via workflows in GitHub and hooks into Heroku from GitHub.
-![GitHub Actions CI](https://github.com/LindsayMoir/FastAPI_Heroku_CICD/actions/workflows/python-package.yml/badge.svg)
 - You can find the repository [here](https://github.com/LindsayMoir/FastAPI_Heroku_CICD).
 
 ## Environment Setup
@@ -126,6 +125,8 @@ GitHub Actions have been implemented. `flake8` and `pytest` are automatically ru
 
 The `model.py` script reads, cleans data, trains the model, and performs inference (batch and single prediction).
 
+```bash
+
                 precision    recall  f1-score   support
 
            0       0.93      0.90      0.91      4940
@@ -134,6 +135,7 @@ The `model.py` script reads, cleans data, trains the model, and performs inferen
     accuracy                           0.87      6508
    macro avg       0.82      0.84      0.83      6508
 weighted avg       0.87      0.87      0.87      6508
+```
 
 ### Model.py Features
 
