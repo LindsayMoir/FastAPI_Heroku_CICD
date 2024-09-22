@@ -179,7 +179,7 @@ weighted avg       0.87      0.87      0.87      6508
 ```bash
 python model.py [your working directory]
 ```
-The working directory that you want to use is the path to where model.py is executing on the target machine. This is not necessarily in the root directory where the folder FastAPI Heroku CICD lives. Depending on how your machine is setup and especially in the GitHub case, it will be executing a in a different directory than your working directory. 
+The working directory that you want to use is the path to where model.py is executing on the target machine. This is not necessarily in the root directory where the folder FastAPI Heroku CICD lives. Depending on how your machine is setup and especially in the GitHub case, it will be executing a in a different directory than where you are positioned in the folder hierarchy with terminal.
 
 ## FastAPI
 
