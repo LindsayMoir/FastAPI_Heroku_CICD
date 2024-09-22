@@ -121,6 +121,27 @@ If you don’t already have it, download and install [Conda here](https://docs.c
 
 GitHub Actions have been implemented. `flake8` and `pytest` are automatically run every time there is a git push to the `main` branch.
 
+### Pytest
+
+There are over 10 tests 
+```bash
+pytest -v
+```
+that are ran automatically every time there is a:
+```bash
+git push origin main
+```
+
+### Flake8
+
+```bash
+flake 8
+```
+is also ran every time there is a 
+```bash
+git push origin main
+```
+
 ## Model
 
 The `model.py` script reads, cleans data, trains the model, and performs inference (batch and single prediction). This is the classifiation report. We are using f1 to choose our best_mdodel.
